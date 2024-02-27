@@ -1,9 +1,13 @@
+// src/composables/getAllCatBreeds.ts
 import { ref } from 'vue'
-import axios from 'axios'
+import { getAllFeline } from '../catfetchconfig/config'
 
 interface Breed {
   id: string;
   name: string;
+  image: {
+    url: string;  
+  }
 }
 
 export default function useCatBreeds() {
@@ -12,11 +16,7 @@ export default function useCatBreeds() {
 
   const fetchBreeds = async () => {
     try {
-      const response = await axios.get('https://api.thecatapi.com/v1/breeds', {
-        headers: {
-          'x-api-key': import.meta.env.VITE_API_KEY
-        }
-      })
+      const response = await getAllFeline.get('/breeds')
       breeds.value = response.data
     } catch (err) {
       error.value = err as Error
