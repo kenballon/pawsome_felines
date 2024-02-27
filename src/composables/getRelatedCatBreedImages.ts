@@ -6,6 +6,7 @@ export interface CatBreedImage {
   breeds: Array<{
     id: string;
     name: string;
+    description: string;
   }>;
 }
 
