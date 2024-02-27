@@ -21,7 +21,7 @@ onMounted(async () => {
     <div class="cat_images_wrapper">
       <div class="cat_img_item" v-for="breed in breeds" :key="breed.id">
         <picture>
-          <img :src="breed.image && breed.image.url ? breed.image.url : defaultImage" :alt="'photo of a cat ' + breed.name">
+          <img :src="breed.image && breed.image.url ? breed.image.url : defaultImage" :alt="'photo of a cat ' + breed.name" loading="lazy">
         </picture>
       </div>
     </div>
