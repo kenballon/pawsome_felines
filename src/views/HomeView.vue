@@ -88,7 +88,7 @@ onMounted(async () => {
 <template>
   <main class="container">
     <h1 class="text-3xl font-bold font-secondary capitalize">
-      You're pawsome feline
+      Your pawsome feline
     </h1>
 
     <CatBreedSearch :breeds="breeds" @update="updateSearchResults" />
