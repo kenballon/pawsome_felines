@@ -7,6 +7,7 @@ export interface CatBreedImage {
     id: string;
     name: string;
     description: string;
+    temperament: string
   }>;
 }
 

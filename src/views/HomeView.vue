@@ -7,7 +7,7 @@ import { onMounted, ref } from "vue";
 interface BreedDetail {
   id: string;
   url: string;
-  breeds: { id: string; name: string; description: string; }[];
+  breeds: { id: string; name: string; description: string; temperament:string; }[];
 }
 
 const breedDetails = ref<BreedDetail[]>([]);
@@ -42,7 +42,8 @@ const allMatchingBreed = async (clickedBreed: Breed) => {
             return {
               id: breed.id,
               name: breed.name,
-              description: breed.description
+              description: breed.description,
+              temperament: breed.temperament
             }
           })
         });
@@ -54,7 +55,7 @@ const allMatchingBreed = async (clickedBreed: Breed) => {
 
 };
 
-const showDetails = (mimingDets:string) => {
+const showDetails = async (mimingDets:string) => {
   try {
     const match = breedDetails.value?.filter((breed) => breed?.id === mimingDets);
     if (match && match.length > 0) {
@@ -64,7 +65,8 @@ const showDetails = (mimingDets:string) => {
           name: breed.name,
           description: breed.description,
           image: match[0].url,
-          id: match[0].id
+          id: match[0].id,
+          temperament: match[0].breeds[0].temperament
         };
 
         console.log(catDetails);
@@ -105,7 +107,7 @@ onMounted(async () => {
     </ul>
     <div class="cat_items">
       <div class="image" v-for="(catBreed) in breedDetails" :key="catBreed.id">
-        <img :src="catBreed.url" alt="Breed image" />
+        <img :src="catBreed.url" alt="Breed image" loading="lazy"/>
         <button :id="catBreed.breeds[0].id"
           class="bg-primary p-2 rounded-sm text-cyan-50 font-light"
           @click="showDetails(catBreed.id)"

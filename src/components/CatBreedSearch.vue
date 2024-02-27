@@ -1,8 +1,17 @@
 <script setup lang="ts">
 import { ref, computed, defineProps, watch } from "vue";
 
+interface Breed {
+  id: string;
+  name: string;
+  // add other properties if needed
+}
+
 const props = defineProps({
-  breeds: Array,
+  breeds: {
+    type: Array as () => Breed[],
+    default: () => [], // provide a default value
+  },
 });
 
 const searchTerm = ref("");
@@ -12,26 +21,36 @@ const filteredBreeds = computed(() => {
   if (!searchTerm.value) {
     return [];
   }
-  return props.breeds.filter((breed) => {
+  return props.breeds.filter((breed: Breed) => {
     return breed.name.toLowerCase().includes(searchTerm.value.toLowerCase());
   });
 });
 
+const handleClick = (breed: Breed) => {
+  console.log(`Clicked on breed: ${breed.name}`);
+};
+
 watch(filteredBreeds, (newVal, oldVal) => {
   emit("update", newVal);
 });
-
 </script>
 
 <template>
   <div>
-    <input type="search" v-model="searchTerm" placeholder="Search for cat breed" class="p-2">
-    <select name="catbreedselect" id="catbreedselect">
-      <option v-for="breed in breeds" :key="breed.id" :value="breed.id">
+    <input
+      type="search"
+      v-model="searchTerm"
+      placeholder="Search for cat breed"
+      class="p-2"
+    />
+    <!-- <ul>
+      <li
+        v-for="breed in filteredBreeds"
+        :key="breed.id"
+        @click="handleClick(breed)"
+      >
         {{ breed.name }}
-      </option>
-    </select>
+      </li>
+    </ul> -->
   </div>
 </template>
-
-<style scoped></style>
