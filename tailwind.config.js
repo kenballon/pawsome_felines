@@ -1,5 +1,5 @@
 export default {
-  purge: ['./src/**/*.{vue,js,ts,jsx,tsx}', './index.html'],
+  content: ['./src/**/*.{vue,js,ts,jsx,tsx}', './index.html'],
   theme: {
     extend: {
       colors: {
