@@ -1,45 +1,91 @@
 <script setup lang="ts">
-import defaultImage from '@/assets/images/cat-default.webp';
 import useCatBreeds from "@/composables/getAllCatBreeds";
-import { onMounted } from "vue";
+import CatBreedSearch from "@/components/CatBreedSearch.vue";
+import { getRelatedCatBreedImages } from '@/composables/getRelatedCatBreedImages';
+import { onMounted, ref } from "vue";
+
+const images = ref<string[]>([]);
+
+interface Breed {
+  id: string;
+  name: string;
+  image: {
+    url: string;
+  };
+}
 
 const { breeds, error, fetchBreeds } = useCatBreeds();
+const searchResults = ref<Breed[] | null>(null);
+
+
+const updateSearchResults = (newResults: Breed[]) => {
+  searchResults.value = newResults;
+};
+
+const allMatchingBreed = async (clickedBreed: Breed) => {
+  const matches = searchResults.value?.filter(
+    (breed) => breed.id === clickedBreed.id
+  );
+  if (matches && matches.length > 0) {
+    try {
+      const response = await getRelatedCatBreedImages(clickedBreed.id);    
+      images.value = response.map((el: { url: string }) => el.url);
+    } catch (err: any) {
+      error.value = err;
+    }
+  }
+};
 
 onMounted(async () => {
   await fetchBreeds();
+  // console.log(breeds.value);
 });
-
 </script>
 
 <template>
-  <main class=" container">
-    <h1 class="text-3xl font-bold font-secondary capitalize">You're pawsome feline</h1>
-    <select name="catbreedselect" id="catbreedselect">
-      <option v-for="breed in breeds" :key="breed.id" :value="breed.id">{{ breed.name }}</option>
-    </select>
+  <main class="container">
+    <h1 class="text-3xl font-bold font-secondary capitalize">
+      You're pawsome feline
+    </h1>
 
-    <div class="cat_images_wrapper">
-      <div class="cat_img_item" v-for="breed in breeds" :key="breed.id">
-        <picture>
-          <img :src="breed.image && breed.image.url ? breed.image.url : defaultImage" :alt="'photo of a cat ' + breed.name" loading="lazy">
-        </picture>
-      </div>
-    </div>
+    <CatBreedSearch :breeds="breeds" @update="updateSearchResults" />
+    <ul class="breed_wrapper cursor-pointer">
+      <li class="breed_item"
+        v-if="searchResults && searchResults.length"
+        v-for="breed in searchResults"
+        :key="breed.id"
+        @click="allMatchingBreed(breed)"
+      >
+        <div class="details">
+          {{ breed.name }} | {{ breed.id.toLocaleUpperCase() }}
+        </div>
+        <div class="cat_items">
+          <div class="image" v-for="(url, index) in images" :key="index">
+            <img :src="url" alt="Breed image" />
+            <button>More Details</button>
+          </div>
+          
+        </div>
+        
+      </li>
+    </ul>
+    <div class="loadmore">
+          <button>Load More</button>
+        </div>
   </main>
 </template>
 
 <style scoped>
-.cat_images_wrapper {
+.cat_items{
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap:1rem;
+  padding: 0;
 }
-
-.cat_img_item img{
-  width: 100%;  
-  height: 100%;
+.cat_items img{
   aspect-ratio: 2/3;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 </style>
