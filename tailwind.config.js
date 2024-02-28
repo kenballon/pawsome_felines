@@ -13,9 +13,12 @@ export default {
       container:{
         center: true,
         padding: '2rem',
-      }
+      },
+      aspectRatio: {},
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/aspect-ratio'),
+  ],
 }
 

@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, defineProps, watch } from "vue";
 
-interface Breed {
-  id: string;
-  name: string;
-  // add other properties if needed
-}
+const searchTerm = ref("");
+const emit = defineEmits(["update", "breed-selected"]);
+const isSearchFocused = ref(false);
+
 
 const props = defineProps({
   breeds: {
@@ -14,20 +13,31 @@ const props = defineProps({
   },
 });
 
-const searchTerm = ref("");
-const emit = defineEmits(["update"]);
+interface Breed {
+  id: string;
+  name: string;
+  image: {
+    url: string;
+  }; 
+}
 
 const filteredBreeds = computed(() => {
-  if (!searchTerm.value) {
-    return [];
+  if (searchTerm.value === '' && isSearchFocused.value) {
+    return props.breeds;
   }
+
   return props.breeds.filter((breed: Breed) => {
     return breed.name.toLowerCase().includes(searchTerm.value.toLowerCase());
   });
 });
 
-const handleClick = (breed: Breed) => {
-  console.log(`Clicked on breed: ${breed.name}`);
+const handleSearchFocus = () => {
+  isSearchFocused.value = true;
+
+};
+
+const handleSearchBlur = () => {
+  isSearchFocused.value = false;
 };
 
 watch(filteredBreeds, (newVal, oldVal) => {
@@ -36,21 +46,64 @@ watch(filteredBreeds, (newVal, oldVal) => {
 </script>
 
 <template>
-  <div>
-    <input
-      type="search"
-      v-model="searchTerm"
-      placeholder="Search for cat breed"
-      class="p-2"
-    />
-    <!-- <ul>
-      <li
-        v-for="breed in filteredBreeds"
-        :key="breed.id"
-        @click="handleClick(breed)"
+ <div class="flex flex-col relative py-4">
+      <input
+        type="search"
+        v-model="searchTerm"
+        placeholder="Search for cat breed"
+        id="search"
+        class="border border-gray-400 w-full p-2 rounded-sm"
+        @focus="handleSearchFocus"
+        @blur="handleSearchBlur"
+        autocomplete="off"
+        spellcheck="false"
+      />
+
+      <div
+        id="breed_results"
+        class="relative border-gray-200 bg-slate-50 shadow-lg shadow-indigo-100/70 rounded-bl-md rounded-br-md"
       >
-        {{ breed.name }}
-      </li>
-    </ul> -->
-  </div>
+        <ul
+          class="breed_results_list w-full flex flex-col gap-1 max-h-[350px] overflow-auto"
+          v-if="filteredBreeds && filteredBreeds.length"
+        >
+          <li
+            class="breed_item relative p-3 hover:bg-indigo-100 cursor-pointer"
+            v-for="breed in filteredBreeds"
+            :key="breed.id"
+            @click="$emit('breed-selected', breed.id)"
+          >
+            <div class="relative flex w-full py-1 justify-between items-center">
+              <div>
+               <span class="block text-sm font-semibold text-gray-800">
+                {{ breed.name }} | {{ breed.id }}
+               </span>
+                
+              </div>
+              <div class="cat_thumb" v-if="breed.image">
+                <picture>
+                  <source
+                    :srcset="breed.image.url"
+                    type="image/webp"
+                  />
+                  <img
+                    :src="breed.image.url"
+                    alt="Breed image"
+                    loading="lazy"
+                    class="cat_search_res_img object-cover rounded-md aspect-[1/1]"
+                  />
+                </picture>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
 </template>
+
+<style scoped>
+.cat_search_res_img{
+  max-width: 40px;
+  max-height: 40px;
+}
+</style>

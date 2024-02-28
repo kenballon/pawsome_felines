@@ -27,58 +27,9 @@ const updateSearchResults = (newResults: Breed[]) => {
   searchResults.value = newResults;
 };
 
-const allMatchingBreed = async (clickedBreed: Breed) => {
-  const matches = searchResults.value?.filter(
-    (breed) => breed.id === clickedBreed.id
-  );
-  if (matches && matches.length > 0) {
-    try {
-      const response = await getRelatedCatBreedImages(clickedBreed.id);
-      response.forEach((breed) => {
-        breedDetails.value.push({
-          id: breed.id,
-          url: breed.url,
-          breeds: breed.breeds.map(breed =>{
-            return {
-              id: breed.id,
-              name: breed.name,
-              description: breed.description,
-              temperament: breed.temperament
-            }
-          })
-        });
-      });
-    } catch (err: any) {
-      error.value = err;
-    }
-  }
-
+const handleBreedClick = (breedId: string) => {
+  console.log(`Breed selected: ${breedId}`);
 };
-
-const showDetails = async (mimingDets:string) => {
-  try {
-    const match = breedDetails.value?.filter((breed) => breed?.id === mimingDets);
-    if (match && match.length > 0) {
-      const breed = match[0].breeds[0];
-      if (breed) {
-        const catDetails = {
-          name: breed.name,
-          description: breed.description,
-          image: match[0].url,
-          id: match[0].id,
-          temperament: match[0].breeds[0].temperament
-        };
-
-        console.log(catDetails);
-      } else {
-        console.error('Breed is undefined or null');
-      }
-    }
-  } catch (error) {
-    console.error('Error in showDetails:', error);
-  }
-};
-
 
 onMounted(async () => {
   await fetchBreeds();
@@ -91,34 +42,8 @@ onMounted(async () => {
       Your pawsome feline
     </h1>
 
-    <CatBreedSearch :breeds="breeds" @update="updateSearchResults" />
-    <ul class="breed_wrapper cursor-pointer">
-      <li
-        class="breed_item"
-        v-if="searchResults && searchResults.length"
-        v-for="breed in searchResults"
-        :key="breed.id"
-        @click="allMatchingBreed(breed)"
-      >
-        <div class="details">
-          {{ breed.name }}
-        </div>
-      </li>
-    </ul>
-    <div class="cat_items">
-      <div class="image" v-for="(catBreed) in breedDetails" :key="catBreed.id">
-        <img :src="catBreed.url" alt="Breed image" loading="lazy"/>
-        <button :id="catBreed.breeds[0].id"
-          class="bg-primary p-2 rounded-sm text-cyan-50 font-light"
-          @click="showDetails(catBreed.id)"
-        >
-          More Details
-        </button>
-      </div>
-    </div>
-    <div class="loadmore">
-      <button>Load More</button>
-    </div>
+    <CatBreedSearch :breeds="breeds" @update="updateSearchResults" @breed-selected="handleBreedClick" />
+  
   </main>
 </template>
 
