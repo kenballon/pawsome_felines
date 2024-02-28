@@ -4,7 +4,7 @@ import { ref, computed, defineProps, watch } from "vue";
 const searchTerm = ref("");
 const emit = defineEmits(["update", "breed-selected"]);
 const isSearchFocused = ref(false);
-
+const isSearchActive = ref(false);
 
 const props = defineProps({
   breeds: {
@@ -18,12 +18,13 @@ interface Breed {
   name: string;
   image: {
     url: string;
-  }; 
+  };
 }
 
 const filteredBreeds = computed(() => {
-  if (searchTerm.value === '' && isSearchFocused.value) {
-    return props.breeds;
+  
+  if (!searchTerm.value) {
+    return isSearchFocused.value ? props.breeds : [];
   }
 
   return props.breeds.filter((breed: Breed) => {
@@ -33,7 +34,7 @@ const filteredBreeds = computed(() => {
 
 const handleSearchFocus = () => {
   isSearchFocused.value = true;
-
+  isSearchActive.value = true;
 };
 
 const handleSearchBlur = () => {
@@ -46,63 +47,59 @@ watch(filteredBreeds, (newVal, oldVal) => {
 </script>
 
 <template>
- <div class="flex flex-col relative py-4">
-      <input
-        type="search"
-        v-model="searchTerm"
-        placeholder="Search for cat breed"
-        id="search"
-        class="border border-gray-400 w-full p-2 rounded-sm"
-        @focus="handleSearchFocus"
-        @blur="handleSearchBlur"
-        autocomplete="off"
-        spellcheck="false"
-      />
+  <div class="flex flex-col relative py-4">
+    <input
+      type="search"
+      v-model="searchTerm"
+      placeholder="Search for cat breed"
+      id="search"
+      class="border border-gray-400 w-full p-2 rounded-sm"
+      @focus="handleSearchFocus"
+      @blur="handleSearchBlur"
+      autocomplete="off"
+      spellcheck="false"
+    />
 
-      <div
-        id="breed_results"
-        class="relative border-gray-200 bg-slate-50 shadow-lg shadow-indigo-100/70 rounded-bl-md rounded-br-md"
+    <div
+      id="breed_results"
+      class="relative border-gray-200 bg-slate-50 shadow-lg shadow-indigo-100/70 rounded-bl-md rounded-br-md"
+    >
+      <ul
+        class="breed_results_list w-full flex flex-col gap-1 max-h-[350px] overflow-auto"
+        v-if="filteredBreeds && filteredBreeds.length"
       >
-        <ul
-          class="breed_results_list w-full flex flex-col gap-1 max-h-[350px] overflow-auto"
-          v-if="filteredBreeds && filteredBreeds.length"
+        <li
+          class="breed_item relative p-3 hover:bg-indigo-100 cursor-pointer"
+          v-for="breed in filteredBreeds"
+          :key="breed.id"
+          @click="$emit('breed-selected', breed.id)"
         >
-          <li
-            class="breed_item relative p-3 hover:bg-indigo-100 cursor-pointer"
-            v-for="breed in filteredBreeds"
-            :key="breed.id"
-            @click="$emit('breed-selected', breed.id)"
-          >
-            <div class="relative flex w-full py-1 justify-between items-center">
-              <div>
-               <span class="block text-sm font-semibold text-gray-800">
+          <div class="relative flex w-full py-1 justify-between items-center">
+            <div>
+              <span class="block text-sm font-semibold text-gray-800">
                 {{ breed.name }} | {{ breed.id }}
-               </span>
-                
-              </div>
-              <div class="cat_thumb" v-if="breed.image">
-                <picture>
-                  <source
-                    :srcset="breed.image.url"
-                    type="image/webp"
-                  />
-                  <img
-                    :src="breed.image.url"
-                    alt="Breed image"
-                    loading="lazy"
-                    class="cat_search_res_img object-cover rounded-md aspect-[1/1]"
-                  />
-                </picture>
-              </div>
+              </span>
             </div>
-          </li>
-        </ul>
-      </div>
+            <div class="cat_thumb" v-if="breed.image">
+              <picture>
+                <source :srcset="breed.image.url" type="image/webp" />
+                <img
+                  :src="breed.image.url"
+                  alt="Breed image"
+                  loading="lazy"
+                  class="cat_search_res_img object-cover rounded-md aspect-[1/1]"
+                />
+              </picture>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
+  </div>
 </template>
 
 <style scoped>
-.cat_search_res_img{
+.cat_search_res_img {
   max-width: 40px;
   max-height: 40px;
 }
