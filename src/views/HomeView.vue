@@ -7,7 +7,12 @@ import { onMounted, ref } from "vue";
 interface BreedDetail {
   id: string;
   url: string;
-  breeds: { id: string; name: string; description: string; temperament:string; }[];
+  breeds: {
+    id: string;
+    name: string;
+    description: string;
+    temperament: string;
+  }[];
 }
 
 const breedDetails = ref<BreedDetail[]>([]);
@@ -27,8 +32,32 @@ const updateSearchResults = (newResults: Breed[]) => {
   searchResults.value = newResults;
 };
 
-const handleBreedClick = (breedId: string) => {
-  console.log(`Breed selected: ${breedId}`);
+const allMatchingBreed = async (breedId: string) => {
+  const searchMatches = searchResults.value?.filter((breed) => breed.id === breedId)
+
+  if(searchMatches && searchMatches.length > 0){
+    try {
+    const response = await getRelatedCatBreedImages(breedId);
+
+    response.forEach((breed) => {
+      breedDetails.value.push({
+        id: breed.id,
+        url: breed.url,
+        breeds: breed.breeds.map((breed) => {
+          return {
+            id: breed.id,
+            name: breed.name,
+            description: breed.description,
+            temperament: breed.temperament,
+          };
+        }),
+      });
+    });
+  } catch (err: any) {
+    error.value = err;
+  }
+  }
+ 
 };
 
 onMounted(async () => {
@@ -42,8 +71,23 @@ onMounted(async () => {
       Your pawsome feline
     </h1>
 
-    <CatBreedSearch :breeds="breeds" @update="updateSearchResults" @breed-selected="handleBreedClick" />
-  
+    <CatBreedSearch
+      :breeds="breeds"
+      @update="updateSearchResults"
+      @breed-selected="allMatchingBreed"
+    />
+
+    <div class="cat_items">
+      <div class="image" v-for="catBreed in breedDetails" :key="catBreed.id">
+        <img :src="catBreed.url" alt="Breed image" loading="lazy" />
+        <button
+          :id="catBreed.breeds[0].id"
+          class="bg-primary p-2 rounded-sm text-cyan-50 font-light"
+        >
+          More Details
+        </button>
+      </div>
+    </div>
   </main>
 </template>
 

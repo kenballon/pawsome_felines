@@ -4,7 +4,6 @@ import { ref, computed, defineProps, watch } from "vue";
 const searchTerm = ref("");
 const emit = defineEmits(["update", "breed-selected"]);
 const isSearchFocused = ref(false);
-const isSearchActive = ref(false);
 
 const props = defineProps({
   breeds: {
@@ -33,12 +32,7 @@ const filteredBreeds = computed(() => {
 });
 
 const handleSearchFocus = () => {
-  isSearchFocused.value = true;
-  isSearchActive.value = true;
-};
-
-const handleSearchBlur = () => {
-  isSearchFocused.value = false;
+  isSearchFocused.value = true; 
 };
 
 watch(filteredBreeds, (newVal, oldVal) => {
@@ -47,7 +41,7 @@ watch(filteredBreeds, (newVal, oldVal) => {
 </script>
 
 <template>
-  <div class="flex flex-col relative py-4">
+  <div class="search_input_container flex flex-col relative py-4" >
     <input
       type="search"
       v-model="searchTerm"
@@ -55,14 +49,14 @@ watch(filteredBreeds, (newVal, oldVal) => {
       id="search"
       class="border border-gray-400 w-full p-2 rounded-sm"
       @focus="handleSearchFocus"
-      @blur="handleSearchBlur"
+      
       autocomplete="off"
       spellcheck="false"
     />
 
     <div
       id="breed_results"
-      class="relative border-gray-200 bg-slate-50 shadow-lg shadow-indigo-100/70 rounded-bl-md rounded-br-md"
+      class="border-gray-200 bg-slate-50 shadow-lg shadow-indigo-100/70 rounded-bl-md rounded-br-md"
     >
       <ul
         class="breed_results_list w-full flex flex-col gap-1 max-h-[350px] overflow-auto"
@@ -102,5 +96,13 @@ watch(filteredBreeds, (newVal, oldVal) => {
 .cat_search_res_img {
   max-width: 40px;
   max-height: 40px;
+}
+
+#breed_results{
+  position: absolute;
+    width: 100%;
+    z-index: 5;
+    backdrop-filter: blur(50px);
+    top: 3.7rem;
 }
 </style>
