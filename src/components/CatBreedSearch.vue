@@ -4,6 +4,7 @@ import { ref, computed, defineProps, watch } from "vue";
 const searchTerm = ref("");
 const emit = defineEmits(["update", "breed-selected"]);
 const isSearchFocused = ref(false);
+let selectedBreed = ref(null);
 
 const props = defineProps({
   breeds: {
@@ -22,17 +23,32 @@ interface Breed {
 
 const filteredBreeds = computed(() => {
   
+  if (selectedBreed.value) {
+    return [];
+  }
+
+
   if (!searchTerm.value) {
     return isSearchFocused.value ? props.breeds : [];
   }
-
+ 
   return props.breeds.filter((breed: Breed) => {
     return breed.name.toLowerCase().includes(searchTerm.value.toLowerCase());
   });
 });
 
 const handleSearchFocus = () => {
-  isSearchFocused.value = true; 
+  isSearchFocused.value = true;
+};
+
+const handleSelectedBreed = (breed: Breed) => {
+  emit("breed-selected", breed.id);
+  setSearchTerm(breed.name);
+  selectedBreed.value = breed;
+};
+
+const setSearchTerm = (term: string) => {
+  searchTerm.value = term; 
 };
 
 watch(filteredBreeds, (newVal, oldVal) => {
@@ -41,7 +57,7 @@ watch(filteredBreeds, (newVal, oldVal) => {
 </script>
 
 <template>
-  <div class="search_input_container flex flex-col relative py-4" >
+  <div class="search_input_container flex flex-col relative py-4">
     <input
       type="search"
       v-model="searchTerm"
@@ -49,7 +65,6 @@ watch(filteredBreeds, (newVal, oldVal) => {
       id="search"
       class="border border-gray-400 w-full p-2 rounded-sm"
       @focus="handleSearchFocus"
-      
       autocomplete="off"
       spellcheck="false"
     />
@@ -66,7 +81,7 @@ watch(filteredBreeds, (newVal, oldVal) => {
           class="breed_item relative p-3 hover:bg-indigo-100 cursor-pointer"
           v-for="breed in filteredBreeds"
           :key="breed.id"
-          @click="$emit('breed-selected', breed.id)"
+          @click="handleSelectedBreed(breed)"
         >
           <div class="relative flex w-full py-1 justify-between items-center">
             <div>
@@ -98,11 +113,11 @@ watch(filteredBreeds, (newVal, oldVal) => {
   max-height: 40px;
 }
 
-#breed_results{
+#breed_results {
   position: absolute;
-    width: 100%;
-    z-index: 5;
-    backdrop-filter: blur(50px);
-    top: 3.7rem;
+  width: 100%;
+  z-index: 5;
+  backdrop-filter: blur(50px);
+  top: 3.7rem;
 }
 </style>
