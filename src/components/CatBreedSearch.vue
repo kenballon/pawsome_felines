@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, defineProps, watch } from "vue";
 
+
+const isSearchFocused = ref(false);
 const searchTerm = ref("");
 const emit = defineEmits(["update", "breed-selected"]);
-const isSearchFocused = ref(false);
-let selectedBreed = ref(null);
 
 const props = defineProps({
   breeds: {
     type: Array as () => Breed[],
-    default: () => [], // provide a default value
+    default: () => [], 
   },
 });
 
@@ -22,19 +22,14 @@ interface Breed {
 }
 
 const filteredBreeds = computed(() => {
-  
-  if (selectedBreed.value) {
-    return [];
-  }
-
 
   if (!searchTerm.value) {
     return isSearchFocused.value ? props.breeds : [];
   }
- 
   return props.breeds.filter((breed: Breed) => {
     return breed.name.toLowerCase().includes(searchTerm.value.toLowerCase());
   });
+  
 });
 
 const handleSearchFocus = () => {
@@ -44,7 +39,7 @@ const handleSearchFocus = () => {
 const handleSelectedBreed = (breed: Breed) => {
   emit("breed-selected", breed.id);
   setSearchTerm(breed.name);
-  selectedBreed.value = breed;
+  isSearchFocused.value = false;
 };
 
 const setSearchTerm = (term: string) => {
@@ -72,10 +67,10 @@ watch(filteredBreeds, (newVal, oldVal) => {
     <div
       id="breed_results"
       class="border-gray-200 bg-slate-50 shadow-lg shadow-indigo-100/70 rounded-bl-md rounded-br-md"
+      v-if="isSearchFocused && filteredBreeds.length > 0"
     >
       <ul
         class="breed_results_list w-full flex flex-col gap-1 max-h-[350px] overflow-auto"
-        v-if="filteredBreeds && filteredBreeds.length"
       >
         <li
           class="breed_item relative p-3 hover:bg-indigo-100 cursor-pointer"
@@ -86,7 +81,7 @@ watch(filteredBreeds, (newVal, oldVal) => {
           <div class="relative flex w-full py-1 justify-between items-center">
             <div>
               <span class="block text-sm font-semibold text-gray-800">
-                {{ breed.name }} | {{ breed.id }}
+                {{ breed.name }}
               </span>
             </div>
             <div class="cat_thumb" v-if="breed.image">
