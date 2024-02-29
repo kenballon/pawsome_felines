@@ -18,8 +18,6 @@ const router = useRouter();
 
 const goBack = (breedId: string) => {
   router.push({ name: "home", params: { breedID: breedId } });
-  console.log(breedId);
-  
 };
 
 onMounted(async () => {

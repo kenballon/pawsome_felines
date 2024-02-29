@@ -17,6 +17,12 @@ const props = defineProps({
 interface BreedDetail {
   id: string;
   url: string;
+  breeds: {
+    id: string;
+    name: string;
+    description: string;
+    temperament: string;
+  }[];
 }
 
 const { breeds, error, fetchBreeds } = useCatBreeds();
@@ -50,12 +56,26 @@ const allMatchingBreed = async (breedId: string) => {
   isLoading.value = false;
 };
 
-const fetchAndProcessBreedDetails = async (breedId: string) => {
+const fromDetailedView = async (breedId: string) => {
+  displayCount.value = 5;
+  isLoading.value = true;
+
+  try {
+    const details = await fetchAndProcessBreedDetails(breedId);
+    breedDetails.value = details;
   
+  } catch (err: any) {
+    error.value = err;
+  }
+
+  isLoading.value = false;
+};
+
+const fetchAndProcessBreedDetails = async (breedId: string) => {
   const response = await getRelatedCatBreedImages(breedId);
 
   if (!response) {
-    throw new Error('Response is undefined');
+    throw new Error("Response is undefined");
   }
 
   return response.map((breed) => ({
@@ -70,7 +90,6 @@ const fetchAndProcessBreedDetails = async (breedId: string) => {
   }));
 };
 
-
 const showCatBreedDetailsView = (catBreedID: string) => {
   router.push({ name: "CatBreed", params: { catBreedID: catBreedID } });
 };
@@ -83,13 +102,15 @@ onMounted(async () => {
   isLoading.value = true;
   try {
     await fetchBreeds();
+    if (props.breedID) {
+      await fromDetailedView(props.breedID);
+    }
   } catch (err: any) {
     error.value = err;
   } finally {
     isLoading.value = false;
   }
 });
-
 </script>
 
 <template>
@@ -118,25 +139,27 @@ onMounted(async () => {
 
       <div class="flex flex-col gap-3 pb-[10rem] items-center">
         <div v-if="isLoading">
-        <h2 class="text-3xl font-bold text-gray-500">We're calling our cat for their photo... 😇</h2>
+          <h2 class="text-3xl font-bold text-gray-500">
+            We're calling our cat for their photo... 😇
+          </h2>
         </div>
         <div v-else>
           <div class="cat_items" v-if="breedDetails && breedDetails.length > 0">
-          <div
-            class="image"
-            v-for="(catBreed, index) in breedDetails.slice(0, displayCount)"
-            :key="index"
-          >
-            <img :src="catBreed.url" alt="Breed image" loading="lazy" />
-            <button
-              :id="catBreed.id"
-              class="bg-primary p-2 rounded-sm text-cyan-50 font-light"
-              @click="showCatBreedDetailsView(catBreed.id)"
+            <div
+              class="image"
+              v-for="(catBreed, index) in breedDetails.slice(0, displayCount)"
+              :key="index"
             >
-              More Details
-            </button>
+              <img :src="catBreed.url" alt="Breed image" loading="lazy" />
+              <button
+                :id="catBreed.id"
+                class="bg-primary p-2 rounded-sm text-cyan-50 font-light"
+                @click="showCatBreedDetailsView(catBreed.id)"
+              >
+                More Details
+              </button>
+            </div>
           </div>
-        </div>
         </div>
 
         <div class="load_more_btn_wrapper w-full max-w-[450px]">
