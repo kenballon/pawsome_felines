@@ -52,7 +52,7 @@ watch(filteredBreeds, (newVal, oldVal) => {
 </script>
 
 <template>
-  <div class="search_input_container flex flex-col relative py-4">
+  <div class="search_input_container flex flex-col relative py-7 max-w-[500px] mx-auto">
     <input
       type="search"
       v-model="searchTerm"
@@ -113,6 +113,6 @@ watch(filteredBreeds, (newVal, oldVal) => {
   width: 100%;
   z-index: 5;
   backdrop-filter: blur(50px);
-  top: 3.7rem;
+  top: 4.45rem;
 }
 </style>

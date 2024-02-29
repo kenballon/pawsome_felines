@@ -56,7 +56,6 @@ const allMatchingBreed = async (breedId: string) => {
 };
 
 const showCatBreedDetailsView = (cardId:string) => {
-  const breedItemID = cardId
   router.push({ name: "CatBreed", params: { breedID: cardId } });
 };
 
@@ -66,18 +65,28 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="main_home_view container">
-    <h1 class="text-3xl font-bold font-secondary capitalize">
-      Your pawsome feline
-    </h1>
+  <main class="main_home_view">
+    <section class="hero_banner">
+      <img
+        src="@/assets/images/hero_banner.jpg"
+        alt="Cat banner"
+        class="w-full h-96 object-cover"
+      />
+    </section>
+    
 
+   <section class="search container">
+    <div class="hero-text  max-w-[500px] mx-auto mt-5">
+      <h1 class="text-6xl font-bold font-secondary capitalize text-center pt-4">
+        Your pawsome feline
+      </h1>
+    </div>
     <CatBreedSearch
       :breeds="breeds"
       @update="updateSearchResults"
       @breed-selected="allMatchingBreed"
     />
-
-    <div class="cat_items">
+    <div class="cat_items" v-if="breedDetails && breedDetails.length > 0">
       <div class="image" v-for="catBreed in breedDetails" :key="catBreed.id">
         <img :src="catBreed.url" alt="Breed image" loading="lazy" />
         <button
@@ -89,13 +98,13 @@ onMounted(async () => {
         </button>
       </div>
     </div>
+   </section>
   </main>
 </template>
 
 <style scoped>
 .main_home_view {
   min-height: calc(100vh - 10rem);
-  padding-top: 8rem;
 }
 .cat_items {
   display: grid;
