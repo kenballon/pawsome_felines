@@ -15,8 +15,6 @@ interface BreedDetail {
   }[];
 }
 
-const breedDetails = ref<BreedDetail[]>([]);
-
 interface Breed {
   id: string;
   name: string;
@@ -27,6 +25,7 @@ interface Breed {
 
 const { breeds, error, fetchBreeds } = useCatBreeds();
 const searchResults = ref<Breed[] | null>(null);
+const breedDetails = ref<BreedDetail[]>([]);
 
 const updateSearchResults = (newResults: Breed[]) => {
   searchResults.value = newResults;
@@ -60,13 +59,22 @@ const allMatchingBreed = async (breedId: string) => {
  
 };
 
+const showCatBreedDetails = (breedId: string) => {
+  const breed = breedDetails.value.find((breed) => breed.breeds[0].id === breedId);
+  if (breed) {
+    alert(
+      `Breed: ${breed.breeds[0].name}\nDescription: ${breed.breeds[0].description}\nTemperament: ${breed.breeds[0].temperament}`
+    );
+  }
+};
+
 onMounted(async () => {
   await fetchBreeds();
 });
 </script>
 
 <template>
-  <main class="container">
+  <main class="main_home_view container">
     <h1 class="text-3xl font-bold font-secondary capitalize">
       Your pawsome feline
     </h1>
@@ -83,6 +91,7 @@ onMounted(async () => {
         <button
           :id="catBreed.breeds[0].id"
           class="bg-primary p-2 rounded-sm text-cyan-50 font-light"
+          @click="showCatBreedDetails(catBreed.breeds[0].id)"
         >
           More Details
         </button>
@@ -92,6 +101,10 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.main_home_view{
+  min-height: calc(100vh - 10rem);
+  padding-top: 8rem;
+}
 .cat_items {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
