@@ -10,9 +10,10 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/breed/:id',
+      path: '/breed/:breedID',
       name: 'CatBreed',
-      component: () => import('../views/CatBreedDetailed.vue')
+      component: () => import('../views/CatBreedDetailed.vue'),
+      props: true
     }
   ]
 })

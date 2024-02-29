@@ -3,6 +3,9 @@ import useCatBreeds from "@/composables/getAllCatBreeds";
 import CatBreedSearch from "@/components/CatBreedSearch.vue";
 import { getRelatedCatBreedImages } from "@/composables/getRelatedCatBreedImages";
 import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 interface BreedDetail {
   id: string;
@@ -15,57 +18,46 @@ interface BreedDetail {
   }[];
 }
 
-interface Breed {
-  id: string;
-  name: string;
-  image: {
-    url: string;
-  };
-}
-
 const { breeds, error, fetchBreeds } = useCatBreeds();
-const searchResults = ref<Breed[] | null>(null);
+const searchResults = ref<BreedDetail[] | null>(null);
 const breedDetails = ref<BreedDetail[]>([]);
 
-const updateSearchResults = (newResults: Breed[]) => {
+const updateSearchResults = (newResults: BreedDetail[]) => {
   searchResults.value = newResults;
 };
 
 const allMatchingBreed = async (breedId: string) => {
-  const searchMatches = searchResults.value?.filter((breed) => breed.id === breedId)
+  const searchMatches = searchResults.value?.filter(
+    (breed) => breed.id === breedId
+  );
 
-  if(searchMatches && searchMatches.length > 0){
+  if (searchMatches && searchMatches.length > 0) {
     try {
-    const response = await getRelatedCatBreedImages(breedId);
+      const response = await getRelatedCatBreedImages(breedId);
 
-    response.forEach((breed) => {
-      breedDetails.value.push({
-        id: breed.id,
-        url: breed.url,
-        breeds: breed.breeds.map((breed) => {
-          return {
-            id: breed.id,
-            name: breed.name,
-            description: breed.description,
-            temperament: breed.temperament,
-          };
-        }),
+      response.forEach((breed) => {
+        breedDetails.value.push({
+          id: breed.id,
+          url: breed.url,
+          breeds: breed.breeds.map((breed) => {
+            return {
+              id: breed.id,
+              name: breed.name,
+              description: breed.description,
+              temperament: breed.temperament,
+            };
+          }),
+        });
       });
-    });
-  } catch (err: any) {
-    error.value = err;
+    } catch (err: any) {
+      error.value = err;
+    }
   }
-  }
- 
 };
 
-const showCatBreedDetails = (breedId: string) => {
-  const breed = breedDetails.value.find((breed) => breed.breeds[0].id === breedId);
-  if (breed) {
-    console.log(
-      `Breed: ${breed.breeds[0].name}\nDescription: ${breed.breeds[0].description}\nTemperament: ${breed.breeds[0].temperament}`
-    );
-  }
+const showCatBreedDetailsView = (cardId:string) => {
+  const breedItemID = cardId
+  router.push({ name: "CatBreed", params: { breedID: cardId } });
 };
 
 onMounted(async () => {
@@ -89,9 +81,9 @@ onMounted(async () => {
       <div class="image" v-for="catBreed in breedDetails" :key="catBreed.id">
         <img :src="catBreed.url" alt="Breed image" loading="lazy" />
         <button
-          :id="catBreed.breeds[0].id"
+          :id="catBreed.id"
           class="bg-primary p-2 rounded-sm text-cyan-50 font-light"
-          @click="showCatBreedDetails(catBreed.breeds[0].id)"
+          @click="showCatBreedDetailsView(catBreed.id)"
         >
           More Details
         </button>
@@ -101,7 +93,7 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.main_home_view{
+.main_home_view {
   min-height: calc(100vh - 10rem);
   padding-top: 8rem;
 }
