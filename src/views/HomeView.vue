@@ -117,7 +117,7 @@ onMounted(async () => {
   <main class="main_home_view">
     <section class="hero_banner">
       <img
-        src="@/assets/images/hero_banner.jpg"
+        src="@/assets/images/hero_cat_img.jpeg"
         alt="Cat banner"
         class="w-full h-96 object-cover"
       />
