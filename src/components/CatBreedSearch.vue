@@ -59,14 +59,15 @@ watch(filteredBreeds, (newVal) => {
       id="search"
       class="border border-gray-400 w-full px-4 rounded-sm"
       @focus="handleSearchFocus"
-      autocomplete="off"
-      spellcheck="false"
+      autocomplete="off"      
+      aria-label="Search for cat breed"
     />
 
     <div
       id="breed_results"
       class="border-gray-200 bg-slate-50 shadow-lg shadow-indigo-100/70 rounded-bl-md rounded-br-md"
       v-if="isSearchFocused && filteredBreeds.length > 0"
+      role="listbox"
     >
       <ul
         class="breed_results_list w-full flex flex-col gap-1 max-h-[350px] overflow-auto"
@@ -76,6 +77,7 @@ watch(filteredBreeds, (newVal) => {
           v-for="breed in filteredBreeds"
           :key="breed.id"
           @click="handleSelectedBreed(breed)"
+          role="option"
         >
           <div class="relative flex w-full py-1 justify-between items-center">
             <div>

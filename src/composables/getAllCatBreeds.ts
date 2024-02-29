@@ -17,9 +17,21 @@ export default function useCatBreeds() {
   const fetchBreeds = async () => {
     try {
       const response = await getAllFeline.get('/breeds')
-      breeds.value = response.data
+      
+      if (Array.isArray(response.data)) {
+        breeds.value = response.data.map(breed => ({
+          id: breed.id,
+          name: breed.name,
+          image: {
+            url: breed.image?.url || ''
+          }
+        }))
+      } else {
+        throw new Error('Invalid response data')
+      }
     } catch (err) {
       error.value = err as Error
+      console.error(err)
     }
   }
 

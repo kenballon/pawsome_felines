@@ -22,22 +22,28 @@ export default function useCatBreedDetails(breedId: string) {
   const fetchBreedDetails = async () => {
     try {
       const response = await getAllFeline.get(`/images/${breedId}`);
-      const item = response.data;
-      const filteredData: CatOneImage = {
-        id: item.id,
-        url: item.url,
-        breeds: item.breeds.map((breed: any) => ({
-          id: breed.id,
-          name: breed.name,
-          origin: breed.origin,
-          description: breed.description,
-          temperament: breed.temperament,
-          wikipedia_url: breed.wikipedia_url,
-        })),
-      };
-      breedDetails.value.push(filteredData);
+      
+      if (response.data && Array.isArray(response.data.breeds)) {
+        const item = response.data;
+        const filteredData: CatOneImage = {
+          id: item.id,
+          url: item.url,
+          breeds: item.breeds.map((breed: any) => ({
+            id: breed.id,
+            name: breed.name,
+            origin: breed.origin,
+            description: breed.description,
+            temperament: breed.temperament,
+            wikipedia_url: breed.wikipedia_url,
+          })),
+        };
+        breedDetails.value.push(filteredData);
+      } else {
+        throw new Error('Invalid response data')
+      }
     } catch (err) {
       error.value = err as Error;
+      console.error(err)
     }
   };
 

@@ -39,22 +39,8 @@ const allMatchingBreed = async (breedId: string) => {
 
   if (searchMatches && searchMatches.length > 0) {
     try {
-      const response = await getRelatedCatBreedImages(breedId);
-
-      response.forEach((breed) => {
-        breedDetails.value.push({
-          id: breed.id,
-          url: breed.url,
-          breeds: breed.breeds.map((breed) => {
-            return {
-              id: breed.id,
-              name: breed.name,
-              description: breed.description,
-              temperament: breed.temperament,
-            };
-          }),
-        });
-      });
+      const details = await fetchAndProcessBreedDetails(breedId);
+      breedDetails.value = details;
     } catch (err: any) {
       error.value = err;
     }
@@ -62,6 +48,32 @@ const allMatchingBreed = async (breedId: string) => {
 
   isLoading.value = false;
 };
+
+const fetchAndProcessBreedDetails = async (breedId: string) => {
+  const response = await getRelatedCatBreedImages(breedId);
+
+  return response.map((breed) => ({
+    id: breed.id,
+    url: breed.url,
+    breeds: breed.breeds.map((breed) => ({
+      id: breed.id,
+      name: breed.name,
+      description: breed.description,
+      temperament: breed.temperament,
+    })),
+  }));
+};
+
+onMounted(async () => {
+  isLoading.value = true;
+  try {
+    await fetchBreeds();
+  } catch (err: any) {
+    error.value = err;
+  } finally {
+    isLoading.value = false;
+  }
+});
 
 const showCatBreedDetailsView = (cardId: string) => {
   router.push({ name: "CatBreed", params: { breedID: cardId } });
@@ -71,11 +83,6 @@ const loadMore = () => {
   displayCount.value += 5;
 };
 
-onMounted(async () => {
-  isLoading.value = true;
-  await fetchBreeds();
-  isLoading.value = false;
-});
 </script>
 
 <template>
@@ -106,7 +113,8 @@ onMounted(async () => {
         <div v-if="isLoading">
         <h2 class="text-3xl font-bold text-gray-500">We're calling our cat for their photo... 😇</h2>
         </div>
-        <div class="cat_items" v-if="breedDetails && breedDetails.length > 0">
+        <div v-else>
+          <div class="cat_items" v-if="breedDetails && breedDetails.length > 0">
           <div
             class="image"
             v-for="(catBreed, index) in breedDetails.slice(0, displayCount)"
@@ -122,6 +130,8 @@ onMounted(async () => {
             </button>
           </div>
         </div>
+        </div>
+
         <div class="load_more_btn_wrapper w-full max-w-[450px]">
           <button
             v-if="breedDetails.length > displayCount"
