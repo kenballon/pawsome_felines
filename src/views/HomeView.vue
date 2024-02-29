@@ -17,12 +17,6 @@ const props = defineProps({
 interface BreedDetail {
   id: string;
   url: string;
-  breeds: {
-    id: string;
-    name: string;
-    description: string;
-    temperament: string;
-  }[];
 }
 
 const { breeds, error, fetchBreeds } = useCatBreeds();
@@ -57,7 +51,12 @@ const allMatchingBreed = async (breedId: string) => {
 };
 
 const fetchAndProcessBreedDetails = async (breedId: string) => {
+  
   const response = await getRelatedCatBreedImages(breedId);
+
+  if (!response) {
+    throw new Error('Response is undefined');
+  }
 
   return response.map((breed) => ({
     id: breed.id,
