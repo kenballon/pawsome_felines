@@ -62,7 +62,7 @@ const allMatchingBreed = async (breedId: string) => {
 const showCatBreedDetails = (breedId: string) => {
   const breed = breedDetails.value.find((breed) => breed.breeds[0].id === breedId);
   if (breed) {
-    alert(
+    console.log(
       `Breed: ${breed.breeds[0].name}\nDescription: ${breed.breeds[0].description}\nTemperament: ${breed.breeds[0].temperament}`
     );
   }
