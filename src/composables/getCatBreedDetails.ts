@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { getAllFeline } from "../catfetchconfig/config";
+import { getAllFeline } from "../thecatapi/config";
 
 export default function useCatBreedDetails(breedId: string) {
   interface CatBreedDetails {

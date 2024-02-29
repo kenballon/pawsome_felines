@@ -1,6 +1,6 @@
 // src/composables/getAllCatBreeds.ts
 import { ref } from 'vue'
-import { getAllFeline } from '../catfetchconfig/config'
+import { getAllFeline } from '../thecatapi/config'
 
 interface Breed {
   id: string;

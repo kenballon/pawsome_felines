@@ -1,4 +1,4 @@
-import { getAllFeline } from "../catfetchconfig/config";
+import { getAllFeline } from "../thecatapi/config";
 
 export interface CatBreedImage {
   id: string;
