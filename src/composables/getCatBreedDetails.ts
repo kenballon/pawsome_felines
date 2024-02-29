@@ -1,27 +1,41 @@
 import { ref } from "vue";
 import { getAllFeline } from "../catfetchconfig/config";
 
-
 export default function useCatBreedDetails(breedId: string) {
-  interface CatBreed {
+  interface CatBreedDetails {
     id: string;
     name: string;
     origin: string;
-    temperament: string;
     description: string;
-    reference_image_id: string;
-    image: {
-      url: string;
-    }
+    temperament: string;
+    wikipedia_url: string;
   }
-  const breedDetails = ref(null);
-  // const breedDetails = ref<CatBreed []>([]);
+  interface CatOneImage {
+    id: string;
+    url: string;
+    breeds: CatBreedDetails[];
+  }
+
+  const breedDetails = ref<CatOneImage[]>([]);
   const error = ref<Error | null>(null);
 
   const fetchBreedDetails = async () => {
     try {
-      const response = await getAllFeline.get(`/images/search?q=${breedId}`);
-      breedDetails.value = response.data;
+      const response = await getAllFeline.get(`/images/${breedId}`);
+      const item = response.data;
+      const filteredData: CatOneImage = {
+        id: item.id,
+        url: item.url,
+        breeds: item.breeds.map((breed: any) => ({
+          id: breed.id,
+          name: breed.name,
+          origin: breed.origin,
+          description: breed.description,
+          temperament: breed.temperament,
+          wikipedia_url: breed.wikipedia_url,
+        })),
+      };
+      breedDetails.value.push(filteredData);
     } catch (err) {
       error.value = err as Error;
     }
