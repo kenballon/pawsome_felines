@@ -7,6 +7,13 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
+const props = defineProps({
+  breedID: {
+    type: String,
+    required: true,
+  },
+});
+
 interface BreedDetail {
   id: string;
   url: string;
@@ -64,6 +71,15 @@ const fetchAndProcessBreedDetails = async (breedId: string) => {
   }));
 };
 
+
+const showCatBreedDetailsView = (catBreedID: string) => {
+  router.push({ name: "CatBreed", params: { catBreedID: catBreedID } });
+};
+
+const loadMore = () => {
+  displayCount.value += 5;
+};
+
 onMounted(async () => {
   isLoading.value = true;
   try {
@@ -74,14 +90,6 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
-
-const showCatBreedDetailsView = (cardId: string) => {
-  router.push({ name: "CatBreed", params: { breedID: cardId } });
-};
-
-const loadMore = () => {
-  displayCount.value += 5;
-};
 
 </script>
 

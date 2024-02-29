@@ -4,20 +4,22 @@ import { useRouter } from "vue-router";
 import useCatBreedDetails from "../composables/getCatBreedDetails";
 
 const props = defineProps({
-  breedID: {
+  catBreedID: {
     type: String,
     required: true,
   },
 });
 
 const { breedDetails, error, fetchBreedDetails } = useCatBreedDetails(
-  props.breedID
+  props.catBreedID
 );
 
 const router = useRouter();
 
-const goBack = () => {
-  router.go(-1);
+const goBack = (breedId: string) => {
+  router.push({ name: "home", params: { breedID: breedId } });
+  console.log(breedId);
+  
 };
 
 onMounted(async () => {
@@ -35,7 +37,7 @@ onMounted(async () => {
         <div
           class="wrapper flex flex-col gap-4"
           v-for="cat in breedDetails"
-          :key="cat.id"
+          :key="cat.id" :data-breed="cat.breeds[0].id"
         >
           <div class="img_wrapper relative">
             <img
@@ -45,7 +47,7 @@ onMounted(async () => {
               class="cat_img_detailed w-full object-cover rounded-md"
             />
             <button
-              @click="goBack"
+              @click="goBack(cat.breeds[0].id)"
               class="goback_btn bg-slate-100 hover:bg-secondary border-gray-700 rounded-md py-3 px-8 text-gray-900"
             >
               Go Back

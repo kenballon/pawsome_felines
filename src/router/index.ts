@@ -5,12 +5,13 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
+      path: '/:breedID?',
       name: 'home',
-      component: HomeView
+      component: HomeView,
+      props: true
     },
     {
-      path: '/breed/:breedID',
+      path: '/breed/:catBreedID',
       name: 'CatBreed',
       component: () => import('../views/CatBreedDetailed.vue'),
       props: true
