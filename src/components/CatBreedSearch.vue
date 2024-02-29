@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
 
-
 const isSearchFocused = ref(false);
 const searchTerm = ref("");
 const emit = defineEmits(["update", "breed-selected"]);
@@ -46,7 +45,7 @@ const setSearchTerm = (term: string) => {
   searchTerm.value = term; 
 };
 
-watch(filteredBreeds, (newVal, oldVal) => {
+watch(filteredBreeds, (newVal) => {
   emit("update", newVal);
 });
 </script>
@@ -58,7 +57,7 @@ watch(filteredBreeds, (newVal, oldVal) => {
       v-model="searchTerm"
       placeholder="Search for cat breed"
       id="search"
-      class="border border-gray-400 w-full p-2 rounded-sm"
+      class="border border-gray-400 w-full px-4 rounded-sm"
       @focus="handleSearchFocus"
       autocomplete="off"
       spellcheck="false"
@@ -86,9 +85,8 @@ watch(filteredBreeds, (newVal, oldVal) => {
             </div>
             <div class="cat_thumb" v-if="breed.image">
               <picture>
-                <source :srcset="breed.image.url" type="image/webp" />
                 <img
-                  :src="breed.image.url"
+                  :src="breed.image.url ? breed.image.url : '@/assets/images/cat-default.webp'"
                   alt="Breed image"
                   loading="lazy"
                   class="cat_search_res_img object-cover rounded-md aspect-[1/1]"
@@ -108,11 +106,15 @@ watch(filteredBreeds, (newVal, oldVal) => {
   max-height: 40px;
 }
 
+input[type="search"] {
+  height: 72px;
+}
+
 #breed_results {
   position: absolute;
   width: 100%;
   z-index: 5;
   backdrop-filter: blur(50px);
-  top: 4.45rem;
+  top: 6.45rem;
 }
 </style>

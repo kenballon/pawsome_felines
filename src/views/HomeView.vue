@@ -21,12 +21,18 @@ interface BreedDetail {
 const { breeds, error, fetchBreeds } = useCatBreeds();
 const searchResults = ref<BreedDetail[] | null>(null);
 const breedDetails = ref<BreedDetail[]>([]);
+const displayCount = ref(5);
+const isLoading = ref(false);
 
 const updateSearchResults = (newResults: BreedDetail[]) => {
   searchResults.value = newResults;
 };
 
 const allMatchingBreed = async (breedId: string) => {
+  breedDetails.value = [];
+  displayCount.value = 5;
+  isLoading.value = true;
+
   const searchMatches = searchResults.value?.filter(
     (breed) => breed.id === breedId
   );
@@ -53,14 +59,22 @@ const allMatchingBreed = async (breedId: string) => {
       error.value = err;
     }
   }
+
+  isLoading.value = false;
 };
 
-const showCatBreedDetailsView = (cardId:string) => {
+const showCatBreedDetailsView = (cardId: string) => {
   router.push({ name: "CatBreed", params: { breedID: cardId } });
 };
 
+const loadMore = () => {
+  displayCount.value += 5;
+};
+
 onMounted(async () => {
+  isLoading.value = true;
   await fetchBreeds();
+  isLoading.value = false;
 });
 </script>
 
@@ -73,36 +87,60 @@ onMounted(async () => {
         class="w-full h-96 object-cover"
       />
     </section>
-    
 
-   <section class="search container">
-    <div class="hero-text  max-w-[500px] mx-auto mt-5">
-      <h1 class="text-6xl font-bold font-secondary capitalize text-center pt-4">
-        Your pawsome feline
-      </h1>
-    </div>
-    <CatBreedSearch
-      :breeds="breeds"
-      @update="updateSearchResults"
-      @breed-selected="allMatchingBreed"
-    />
-    <div class="cat_items" v-if="breedDetails && breedDetails.length > 0">
-      <div class="image" v-for="catBreed in breedDetails" :key="catBreed.id">
-        <img :src="catBreed.url" alt="Breed image" loading="lazy" />
-        <button
-          :id="catBreed.id"
-          class="bg-primary p-2 rounded-sm text-cyan-50 font-light"
-          @click="showCatBreedDetailsView(catBreed.id)"
+    <section class="search container">
+      <div class="hero-text max-w-[500px] mx-auto mt-5">
+        <h1
+          class="text-6xl font-bold font-secondary capitalize text-center text-indigo-50 pt-4 text-shadow-default"
         >
-          More Details
-        </button>
+          pawsome feline search
+        </h1>
       </div>
-    </div>
-   </section>
+      <CatBreedSearch
+        :breeds="breeds"
+        @update="updateSearchResults"
+        @breed-selected="allMatchingBreed"
+      />
+
+      <div class="flex flex-col gap-3 pb-[10rem] items-center">
+        <div v-if="isLoading">
+        <h2 class="text-3xl font-bold text-gray-500">We're calling our cat for their photo... 😇</h2>
+        </div>
+        <div class="cat_items" v-if="breedDetails && breedDetails.length > 0">
+          <div
+            class="image"
+            v-for="(catBreed, index) in breedDetails.slice(0, displayCount)"
+            :key="index"
+          >
+            <img :src="catBreed.url" alt="Breed image" loading="lazy" />
+            <button
+              :id="catBreed.id"
+              class="bg-primary p-2 rounded-sm text-cyan-50 font-light"
+              @click="showCatBreedDetailsView(catBreed.id)"
+            >
+              More Details
+            </button>
+          </div>
+        </div>
+        <div class="load_more_btn_wrapper w-full max-w-[450px]">
+          <button
+            v-if="breedDetails.length > displayCount"
+            class="bg-primary p-2 h-[56px] hover:bg-secondary hover:text-pink-950 mt-7 rounded-sm text-cyan-50 font-light w-full"
+            @click="loadMore"
+          >
+            Load More
+          </button>
+        </div>
+      </div>
+    </section>
   </main>
 </template>
 
 <style scoped>
+.search {
+  position: relative;
+  margin-top: -220px;
+}
 .main_home_view {
   min-height: calc(100vh - 10rem);
 }
@@ -135,6 +173,6 @@ onMounted(async () => {
   width: calc(100% - 1rem);
 }
 .cat_items .image button:hover {
-  background-color: rgb(182, 72, 72);
+  background-color: #b64848;
 }
 </style>
