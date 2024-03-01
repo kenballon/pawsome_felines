@@ -17,11 +17,13 @@ export async function getRelatedCatBreedImages(breedId: string): Promise<CatBree
   try {
     const response = await getAllFeline.get<CatBreedImage[]>('/images/search', {
       params: {
-        limit: 50,
+        limit: 100,
         breed_ids: breedId
       }
     });
+    
     return response.data;
+
   } catch (error) {
     console.error(`Failed to get cat breed images: ${error}`);
   }

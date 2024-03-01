@@ -30,6 +30,7 @@ const searchResults = ref<BreedDetail[] | null>(null);
 const breedDetails = ref<BreedDetail[]>([]);
 const displayCount = ref(5);
 const isLoading = ref(false);
+const breedName = ref("");
 
 const updateSearchResults = (newResults: BreedDetail[]) => {
   searchResults.value = newResults;
@@ -63,7 +64,11 @@ const fromDetailedView = async (breedId: string) => {
   try {
     const details = await fetchAndProcessBreedDetails(breedId);
     breedDetails.value = details;
-  
+
+    const breed = details.find((breed) => breed.breeds[0].id === breedId);
+    const breedNameFromDetailedView = breed ? breed.breeds[0].name : null;
+    breedName.value = breedNameFromDetailedView || "";
+
   } catch (err: any) {
     error.value = err;
   }
@@ -89,6 +94,8 @@ const fetchAndProcessBreedDetails = async (breedId: string) => {
     })),
   }));
 };
+
+
 
 const showCatBreedDetailsView = (catBreedID: string) => {
   router.push({ name: "CatBreed", params: { catBreedID: catBreedID } });
@@ -131,10 +138,12 @@ onMounted(async () => {
           pawsome feline search
         </h1>
       </div>
+
       <CatBreedSearch
         :breeds="breeds"
         @update="updateSearchResults"
         @breed-selected="allMatchingBreed"
+        :breedName="breedName"
       />
 
       <div class="flex flex-col gap-3 pb-[10rem] items-center">

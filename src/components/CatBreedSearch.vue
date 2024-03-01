@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 
 const isSearchFocused = ref(false);
 const searchTerm = ref("");
@@ -10,6 +10,10 @@ const props = defineProps({
     type: Array as () => Breed[],
     default: () => [], 
   },
+  breedName: {
+    type: String,
+    default: ''
+  }
 });
 
 interface Breed {
@@ -21,12 +25,13 @@ interface Breed {
 }
 
 const filteredBreeds = computed(() => {
+  const lowerCaseSearchTerm = searchTerm.value.toLowerCase();
 
-  if (!searchTerm.value) {
+  if (!lowerCaseSearchTerm) {
     return isSearchFocused.value ? props.breeds : [];
   }
   return props.breeds.filter((breed: Breed) => {
-    return breed.name.toLowerCase().includes(searchTerm.value.toLowerCase());
+    return breed.name.toLowerCase().includes(lowerCaseSearchTerm) && breed.image && breed.image.url;
   });
   
 });
@@ -47,6 +52,16 @@ const setSearchTerm = (term: string) => {
 
 watch(filteredBreeds, (newVal) => {
   emit("update", newVal);
+});
+
+watch(() => props.breedName, (newBreedName) => {
+  setSearchTerm(newBreedName);
+});
+
+onMounted(() => {
+  if (props.breedName) {
+    setSearchTerm(props.breedName);
+  }
 });
 </script>
 
@@ -77,18 +92,18 @@ watch(filteredBreeds, (newVal) => {
           v-for="breed in filteredBreeds"
           :key="breed.id"
           @click="handleSelectedBreed(breed)"
-          role="option"
+          role="option"        
         >
-          <div class="relative flex w-full py-1 justify-between items-center">
+          <div class="relative flex w-full py-1 justify-between items-center" >
             <div>
               <span class="block text-sm font-semibold text-gray-800">
                 {{ breed.name }}
               </span>
             </div>
-            <div class="cat_thumb" v-if="breed.image">
+            <div class="cat_thumb">
               <picture>
                 <img
-                  :src="breed.image.url ? breed.image.url : '@/assets/images/cat-default.webp'"
+                  :src="breed.image.url ? breed.image.url : '/src/assets/images/cat-default.webp'"
                   alt="Breed image"
                   loading="lazy"
                   class="cat_search_res_img object-cover rounded-md aspect-[1/1]"
