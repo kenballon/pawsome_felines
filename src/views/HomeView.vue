@@ -132,11 +132,13 @@ onMounted(async () => {
 
     <section class="search container">
       <div class="hero-text max-w-[500px] mx-auto mt-5">
-        <h1
-          class="text-6xl font-bold font-secondary capitalize text-center text-indigo-50 pt-4 text-shadow-default"
-        >
-          pawsome feline search
-        </h1>
+        <router-link :to="{name: 'home'}">
+          <h1
+            class="text-6xl font-bold font-secondary capitalize text-center text-indigo-50 pt-4 text-shadow-default cursor-pointer"
+          >
+            pawsome feline search
+          </h1>
+        </router-link>
       </div>
 
       <CatBreedSearch
