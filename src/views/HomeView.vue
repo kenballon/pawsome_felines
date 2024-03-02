@@ -95,8 +95,6 @@ const fetchAndProcessBreedDetails = async (breedId: string) => {
   }));
 };
 
-
-
 const showCatBreedDetailsView = (catBreedID: string) => {
   router.push({ name: "CatBreed", params: { catBreedID: catBreedID } });
 };
