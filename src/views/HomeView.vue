@@ -68,13 +68,11 @@ const fromDetailedView = async (breedId: string) => {
     const breed = details.find((breed) => breed.breeds[0].id === breedId);
     const breedNameFromDetailedView = breed ? breed.breeds[0].name : null;
     breedName.value = breedNameFromDetailedView || "";
-
   } catch (err: any) {
     error.value = err;
-  }finally{
+  } finally {
     isLoading.value = false;
   }
-  
 };
 
 const fetchAndProcessBreedDetails = async (breedId: string) => {
@@ -131,7 +129,7 @@ onMounted(async () => {
 
     <section class="search container">
       <div class="hero-text max-w-[500px] mx-auto mt-5">
-        <router-link :to="{name: 'home'}">
+        <router-link :to="{ name: 'home' }">
           <h1
             class="text-6xl font-bold font-secondary capitalize text-center text-indigo-50 pt-4 text-shadow-default cursor-pointer"
           >
