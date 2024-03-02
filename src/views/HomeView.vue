@@ -71,9 +71,10 @@ const fromDetailedView = async (breedId: string) => {
 
   } catch (err: any) {
     error.value = err;
+  }finally{
+    isLoading.value = false;
   }
-
-  isLoading.value = false;
+  
 };
 
 const fetchAndProcessBreedDetails = async (breedId: string) => {
