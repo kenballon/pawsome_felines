@@ -146,19 +146,19 @@ onMounted(async () => {
       />
 
       <div class="flex flex-col gap-3 pb-[10rem] items-center">
-        <div v-if="isLoading">
+        <div v-show="isLoading">
           <h2 class="text-3xl font-bold text-gray-500">
             We're calling our cat for their photo... 😇
           </h2>
         </div>
-        <div v-else>
+        <div v-show="!isLoading">
           <div class="cat_items" v-if="breedDetails && breedDetails.length > 0">
             <div
               class="image"
               v-for="(catBreed, index) in breedDetails.slice(0, displayCount)"
               :key="index"
             >
-              <img :src="catBreed.url" alt="Breed image" loading="lazy" />
+              <img :src="catBreed.url" alt="Breed image" />
               <button
                 :id="catBreed.id"
                 class="bg-primary p-2 rounded-sm text-cyan-50 font-light"
@@ -172,7 +172,7 @@ onMounted(async () => {
 
         <div class="load_more_btn_wrapper w-full max-w-[450px]">
           <button
-            v-if="breedDetails.length > displayCount"
+            v-show="breedDetails.length > displayCount"
             class="bg-primary p-2 h-[56px] hover:bg-secondary hover:text-pink-950 mt-7 rounded-sm text-cyan-50 font-light w-full"
             @click="loadMore"
           >

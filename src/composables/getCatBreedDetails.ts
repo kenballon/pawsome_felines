@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { getAllFeline } from "../thecatapi/config";
+import instance, { handleApiError } from './errorHandler';
 
 export default function useCatBreedDetails(breedId: string) {
   interface CatBreedDetails {
@@ -21,7 +21,7 @@ export default function useCatBreedDetails(breedId: string) {
 
   const fetchBreedDetails = async () => {
     try {
-      const response = await getAllFeline.get(`/images/${breedId}`);
+      const response = await instance.get(`/images/${breedId}`);
       
       if (response.data && Array.isArray(response.data.breeds)) {
         const item = response.data;
@@ -43,7 +43,7 @@ export default function useCatBreedDetails(breedId: string) {
       }
     } catch (err) {
       error.value = err as Error;
-      console.error(err)
+      handleApiError(err);
     }
   };
 

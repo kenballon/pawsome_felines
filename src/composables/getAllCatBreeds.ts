@@ -1,6 +1,6 @@
 // src/composables/getAllCatBreeds.ts
 import { ref } from 'vue'
-import { getAllFeline } from '../thecatapi/config'
+import instance, { handleApiError } from './errorHandler';
 
 interface Breed {
   id: string;
@@ -16,7 +16,7 @@ export default function useCatBreeds() {
 
   const fetchBreeds = async () => {
     try {
-      const response = await getAllFeline.get('/breeds')
+      const response = await instance.get('/breeds')
       
       if (Array.isArray(response.data)) {
         breeds.value = response.data.map(breed => ({
@@ -31,7 +31,7 @@ export default function useCatBreeds() {
       }
     } catch (err) {
       error.value = err as Error
-      console.error(err)
+      handleApiError(err)
     }
   }
 

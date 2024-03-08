@@ -1,4 +1,4 @@
-import { getAllFeline } from "../thecatapi/config";
+import instance, { handleApiError } from './errorHandler';
 
 export interface Breed {
   id: string;
@@ -15,16 +15,29 @@ export interface CatBreedImage {
 
 export async function getRelatedCatBreedImages(breedId: string): Promise<CatBreedImage[] | undefined> {
   try {
-    const response = await getAllFeline.get<CatBreedImage[]>('/images/search', {
+    const response = await instance.get<CatBreedImage[]>('/images/search', {
       params: {
-        limit: 100,
+        limit: 50,
         breed_ids: breedId
       }
     });
     
-    return response.data;
+    if (Array.isArray(response.data)) {
+      return response.data.map(image => ({
+        id: image.id,
+        url: image.url,
+        breeds: image.breeds.map(breed => ({
+          id: breed.id,
+          name: breed.name,
+          description: breed.description,
+          temperament: breed.temperament,
+        }))
+      }));
+    } else {
+      throw new Error('Invalid response data');
+    }
 
   } catch (error) {
-    console.error(`Failed to get cat breed images: ${error}`);
+    handleApiError(error);
   }
 }
