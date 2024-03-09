@@ -43,7 +43,7 @@ watch([searchTerm, breeds], ([newVal, newBreeds]) => {
 const breedSelected = (breed: Breed) => {
   searchTerm.value = breed.name;
   inputFocused.value = false;
-  emit("selectedBreed", breed.image_ref_id);   
+  emit("selectedBreed", {breedId: breed.id, breedImgId: breed.image_ref_id}); 
 };
 
 // Handle input blur
