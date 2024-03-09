@@ -26,12 +26,12 @@ export async function getRelatedCatBreedImages(breedId: string): Promise<CatBree
       return response.data.map(image => ({
         id: image.id,
         url: image.url,
-        breeds: image.breeds.map(breed => ({
+        breeds: Array.isArray(image.breeds) ? image.breeds.map(breed => ({
           id: breed.id,
           name: breed.name,
           description: breed.description,
           temperament: breed.temperament,
-        }))
+        })) : [],
       }));
     } else {
       throw new Error('Invalid response data');

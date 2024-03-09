@@ -1,120 +1,6 @@
 <script setup lang="ts">
-import useCatBreeds from "@/composables/getAllCatBreeds";
 import CatBreedSearch from "@/components/CatBreedSearch.vue";
-import { getRelatedCatBreedImages } from "@/composables/getRelatedCatBreedImages";
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
 
-const router = useRouter();
-
-const props = defineProps({
-  breedID: {
-    type: String,
-    required: true,
-  },
-});
-
-interface BreedDetail {
-  id: string;
-  url: string;
-  breeds: {
-    id: string;
-    name: string;
-    description: string;
-    temperament: string;
-  }[];
-}
-
-const { breeds, error, fetchBreeds } = useCatBreeds();
-const searchResults = ref<BreedDetail[] | null>(null);
-const breedDetails = ref<BreedDetail[]>([]);
-const displayCount = ref(5);
-const isLoading = ref(false);
-const breedName = ref("");
-
-const updateSearchResults = (newResults: BreedDetail[]) => {
-  searchResults.value = newResults;
-};
-
-const allMatchingBreed = async (breedId: string) => {
-  breedDetails.value = [];
-  displayCount.value = 5;
-  isLoading.value = true;
-
-  const searchMatches = searchResults.value?.filter(
-    (breed) => breed.id === breedId
-  );
-
-  if (searchMatches && searchMatches.length > 0) {
-    try {
-      const details = await fetchAndProcessBreedDetails(breedId);
-      breedDetails.value = details;
-    } catch (err: any) {
-      error.value = err;
-    }
-  }
-
-  isLoading.value = false;
-};
-
-const fromDetailedView = async (breedId: string) => {
-  displayCount.value = 5;
-  isLoading.value = true;
-
-  try {
-    const details = await fetchAndProcessBreedDetails(breedId);
-    breedDetails.value = details;
-
-    const breed = details.find((breed) => breed.breeds[0].id === breedId);
-    const breedNameFromDetailedView = breed ? breed.breeds[0].name : null;
-    breedName.value = breedNameFromDetailedView || "";
-  } catch (err: any) {
-    error.value = err;
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const fetchAndProcessBreedDetails = async (breedId: string) => {
-  const response = await getRelatedCatBreedImages(breedId);
-
-  if (!response) {
-    throw new Error("Response is undefined");
-  }
-
-  return response.map((breed) => ({
-    id: breed.id,
-    url: breed.url,
-    breeds: breed.breeds.map((breed) => ({
-      id: breed.id,
-      name: breed.name,
-      description: breed.description,
-      temperament: breed.temperament,
-    })),
-  }));
-};
-
-const showCatBreedDetailsView = (catBreedID: string) => {
-  router.push({ name: "CatBreed", params: { catBreedID: catBreedID } });
-};
-
-const loadMore = () => {
-  displayCount.value += 5;
-};
-
-onMounted(async () => {
-  isLoading.value = true;
-  try {
-    await fetchBreeds();
-    if (props.breedID) {
-      await fromDetailedView(props.breedID);
-    }
-  } catch (err: any) {
-    error.value = err;
-  } finally {
-    isLoading.value = false;
-  }
-});
 </script>
 
 <template>
@@ -138,14 +24,9 @@ onMounted(async () => {
         </router-link>
       </div>
 
-      <CatBreedSearch
-        :breeds="breeds"
-        @update="updateSearchResults"
-        @breed-selected="allMatchingBreed"
-        :breedName="breedName"
-      />
+      <CatBreedSearch />
 
-      <div class="flex flex-col gap-3 pb-[10rem] items-center">
+      <!-- <div class="flex flex-col gap-3 pb-[10rem] items-center">
         <div v-show="isLoading">
           <h2 class="text-3xl font-bold text-gray-500">
             We're calling our cat for their photo... 😇
@@ -179,7 +60,7 @@ onMounted(async () => {
             Load More
           </button>
         </div>
-      </div>
+      </div> -->
     </section>
   </main>
 </template>

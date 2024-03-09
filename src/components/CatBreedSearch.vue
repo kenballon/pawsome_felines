@@ -1,88 +1,90 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, watch, onMounted } from "vue";
+import useCatBreeds from "@/composables/getAllCatBreeds";
 
-const isSearchFocused = ref(false);
-const searchTerm = ref("");
-const emit = defineEmits(["update", "breed-selected"]);
-
+// Defined props
 const props = defineProps({
-  breeds: {
-    type: Array as () => Breed[],
-    default: () => [], 
-  },
-  breedName: {
+  searchTerm: {
     type: String,
-    default: ''
-  }
+    default: "",
+  },
 });
 
+// Interfaces
 interface Breed {
   id: string;
   name: string;
-  image: {
-    url: string;
-  };
+  image_ref_id: string;
 }
 
-const filteredBreeds = computed(() => {
-  const lowerCaseSearchTerm = searchTerm.value.toLowerCase();
+// Initialize refs
+const searchTerm = ref(props.searchTerm);
+const emit = defineEmits(["selectedBreed"]);
+const { breeds, fetchBreeds } = useCatBreeds();
+const inputFocused = ref(false);
+const filteredBreeds = ref<Breed[]>([]);
+let blurTimeout: any = null;
 
-  if (!lowerCaseSearchTerm) {
-    return isSearchFocused.value ? props.breeds : [];
-  }
-  return props.breeds.filter((breed: Breed) => {
-    return breed.name.toLowerCase().includes(lowerCaseSearchTerm) && breed.image && breed.image.url;
-  });
-  
-});
+// Fetch breeds on mount
+onMounted(fetchBreeds);
 
-const handleSearchFocus = () => {
-  isSearchFocused.value = true;
-};
-
-const handleSelectedBreed = (breed: Breed) => {
-  emit("breed-selected", breed.id);
-  setSearchTerm(breed.name);
-  isSearchFocused.value = false;
-};
-
-const setSearchTerm = (term: string) => {
-  searchTerm.value = term; 
-};
-
-watch(filteredBreeds, (newVal) => {
-  emit("update", newVal);
-});
-
-watch(() => props.breedName, (newBreedName) => {
-  setSearchTerm(newBreedName);
-});
-
-onMounted(() => {
-  if (props.breedName) {
-    setSearchTerm(props.breedName);
+// Watch for changes in searchTerm and filter breeds
+watch([searchTerm, breeds], ([newVal, newBreeds]) => {
+  if (newVal) {
+    filteredBreeds.value = breeds.value.filter((breed) =>
+      breed.name.toLowerCase().includes(newVal.toLowerCase())
+    );
+  } else {
+    filteredBreeds.value = newBreeds;
   }
 });
+
+// Handle breed selection
+const breedSelected = (breed: Breed) => {
+  searchTerm.value = breed.name;
+  inputFocused.value = false;
+  emit("selectedBreed", breed.image_ref_id);   
+};
+
+// Handle input blur
+const handleBlur = () => {
+  blurTimeout = setTimeout(() => {
+    inputFocused.value = false;
+  }, 200) as any;
+};
+
+// Handle input focus
+const handleFocus = () => {
+  clearTimeout(blurTimeout);
+  inputFocused.value = true;
+  if (breeds.value.length === 0) {
+    fetchBreeds();
+  }
+};
+
 </script>
 
 <template>
-  <div class="search_input_container flex flex-col relative py-7 max-w-[500px] mx-auto">
+  <div
+    class="search_input_container flex flex-col relative py-7 max-w-[500px] mx-auto"
+  >
     <input
       type="search"
       v-model="searchTerm"
       placeholder="Search for cat breed"
       id="search"
       class="border border-gray-400 w-full px-4 rounded-sm"
-      @focus="handleSearchFocus"
-      autocomplete="off"      
+      autocomplete="off"
       aria-label="Search for cat breed"
+      @focus="handleFocus"
+      @blur="handleBlur"
     />
 
     <div
       id="breed_results"
       class="border-gray-200 bg-slate-50 shadow-lg shadow-indigo-100/70 rounded-bl-md rounded-br-md"
-      v-if="isSearchFocused && filteredBreeds.length > 0"
       role="listbox"
+      v-show="inputFocused"
     >
       <ul
         class="breed_results_list w-full flex flex-col gap-1 max-h-[350px] overflow-auto"
@@ -91,25 +93,26 @@ onMounted(() => {
           class="breed_item relative p-3 hover:bg-indigo-100 cursor-pointer"
           v-for="breed in filteredBreeds"
           :key="breed.id"
-          @click="handleSelectedBreed(breed)"
-          role="option"        
+          @click="breedSelected(breed)"
+          role="option"
         >
-          <div class="relative flex w-full py-1 justify-between items-center" >
+          <div class="relative flex w-full py-1 justify-between items-center">
             <div>
               <span class="block text-sm font-semibold text-gray-800">
                 {{ breed.name }}
               </span>
             </div>
-            <div class="cat_thumb">
+            <!-- <div class="cat_thumb">
               <picture>
                 <img
-                  :src="breed.image.url ? breed.image.url : '/src/assets/images/cat-default.webp'"
-                  alt="Breed image"
+                :src="breed.image.url"
+                  :alt="`Breed image of ${breed.name}`"
+                 
                   loading="lazy"
                   class="cat_search_res_img object-cover rounded-md aspect-[1/1]"
                 />
               </picture>
-            </div>
+            </div> -->
           </div>
         </li>
       </ul>

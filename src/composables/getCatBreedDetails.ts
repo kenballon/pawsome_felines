@@ -28,14 +28,14 @@ export default function useCatBreedDetails(breedId: string) {
         const filteredData: CatOneImage = {
           id: item.id,
           url: item.url,
-          breeds: item.breeds.map((breed: any) => ({
+          breeds: Array.isArray(item.breeds) ? item.breeds.map((breed: any) => ({
             id: breed.id,
             name: breed.name,
             origin: breed.origin,
             description: breed.description,
             temperament: breed.temperament,
             wikipedia_url: breed.wikipedia_url,
-          })),
+          })) : [],
         };
         breedDetails.value.push(filteredData);
       } else {

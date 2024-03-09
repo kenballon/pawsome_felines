@@ -1,13 +1,11 @@
-// src/composables/getAllCatBreeds.ts
 import { ref } from 'vue'
 import instance, { handleApiError } from './errorHandler';
 
 interface Breed {
   id: string;
   name: string;
-  image: {
-    url: string;  
-  }
+  image_ref_id: string;
+  
 }
 
 export default function useCatBreeds() {
@@ -16,15 +14,13 @@ export default function useCatBreeds() {
 
   const fetchBreeds = async () => {
     try {
-      const response = await instance.get('/breeds')
-      
+      const response = await instance.get('/breeds')   
+      // console.log(response.data);
       if (Array.isArray(response.data)) {
         breeds.value = response.data.map(breed => ({
           id: breed.id,
           name: breed.name,
-          image: {
-            url: breed.image?.url || ''
-          }
+          image_ref_id: breed.reference_image_id
         }))
       } else {
         throw new Error('Invalid response data')
