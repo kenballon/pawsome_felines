@@ -60,6 +60,7 @@ const handleFocus = () => {
   if (breeds.value.length === 0) {
     fetchBreeds();
   }
+  
 };
 
 </script>

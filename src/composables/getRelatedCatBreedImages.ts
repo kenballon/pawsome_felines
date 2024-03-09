@@ -17,7 +17,7 @@ export async function getRelatedCatBreedImages(breedId: string): Promise<CatBree
   try {
     const response = await instance.get<CatBreedImage[]>('/images/search', {
       params: {
-        limit: 50,
+        limit: 20,
         breed_ids: breedId
       }
     });
