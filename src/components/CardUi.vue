@@ -46,7 +46,6 @@ const handleImageLoad = (event: Event) => {
       class="cat_image fade-in"
       :src="catBreedImage"
       alt="Breed image"
-      loading="lazy"
       width="250px"
       @load="handleImageLoad"
     />
