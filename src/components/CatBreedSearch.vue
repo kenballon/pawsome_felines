@@ -8,6 +8,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  id:{
+    type:String, 
+    default: ""
+  }
 });
 
 // Interfaces
@@ -65,6 +69,10 @@ const handleFocus = () => {
   
 };
 
+const updateSearch = (value: string) => {
+  searchTerm.value = value;
+}
+
 </script>
 
 <template>
@@ -81,6 +89,7 @@ const handleFocus = () => {
       aria-label="Search for cat breed"
       @focus="handleFocus"
       @blur="handleBlur"
+      @input="updateSearch(props.id)"
     />
 
     <div

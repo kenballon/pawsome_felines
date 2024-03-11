@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import CatBreedSearch from "@/components/CatBreedSearch.vue";
 import CardUi from "@/components/CardUi.vue";
 import { getRelatedCatBreedImages } from "@/composables/getRelatedCatBreedImages";
+
+const props = defineProps({
+  breedID: {
+    type: String,
+    default: "",
+  },
+});
 
 interface CatBreedImage {
   id: string;
@@ -24,8 +31,18 @@ const handleSelectedBreed = async ({
   selectedBreedId.value = breedId;
   selectedBreedImageId.value = breedImgId;
   const images = await getRelatedCatBreedImages(breedId);
+  
   relatedImages.value = images || [];
+  console.log(images);
 };
+
+onMounted(() => {
+  if (props.breedID) {
+    selectedBreedId.value = props.breedID;
+    console.log(relatedImages.value);
+  }
+})
+
 </script>
 
 <template>
