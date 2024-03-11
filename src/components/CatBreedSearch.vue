@@ -23,7 +23,7 @@ const emit = defineEmits(["selectedBreed"]);
 const { breeds, fetchBreeds } = getAllCatBreeds();
 const inputFocused = ref(false);
 const filteredBreeds = ref<Breed[]>([]);
-let blurTimeout: any = null;
+let blurTimeout: number | null = null;
 
 // Fetch breeds on mount
 onMounted(fetchBreeds);
@@ -48,14 +48,16 @@ const breedSelected = (breed: Breed) => {
 
 // Handle input blur
 const handleBlur = () => {
-  blurTimeout = setTimeout(() => {
+  blurTimeout = window.setTimeout(() => {
     inputFocused.value = false;
-  }, 200) as any;
+  }, 200);
 };
 
 // Handle input focus
 const handleFocus = () => {
-  clearTimeout(blurTimeout);
+  if (blurTimeout !== null) {
+    window.clearTimeout(blurTimeout);
+  }
   inputFocused.value = true;
   if (breeds.value.length === 0) {
     fetchBreeds();
@@ -102,18 +104,7 @@ const handleFocus = () => {
               <span class="block text-sm font-semibold text-gray-800">
                 {{ breed.name }}
               </span>
-            </div>
-            <!-- <div class="cat_thumb">
-              <picture>
-                <img
-                :src="breed.image.url"
-                  :alt="`Breed image of ${breed.name}`"
-                 
-                  loading="lazy"
-                  class="cat_search_res_img object-cover rounded-md aspect-[1/1]"
-                />
-              </picture>
-            </div> -->
+            </div>          
           </div>
         </li>
       </ul>
