@@ -33,13 +33,13 @@ const handleSelectedBreed = async ({
   const images = await getRelatedCatBreedImages(breedId);
   
   relatedImages.value = images || [];
-  console.log(images);
+  // console.log(images);
 };
 
 onMounted(() => {
   if (props.breedID) {
     selectedBreedId.value = props.breedID;
-    console.log(relatedImages.value);
+    // console.log(selectedBreedId.value);
   }
 })
 
