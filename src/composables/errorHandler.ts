@@ -1,32 +1,37 @@
-import axios from 'axios';
+import axios from "axios";
 
 const instance = axios.create({
-  baseURL: 'https://api.thecatapi.com/v1',
+  baseURL: "https://api.thecatapi.com/v1",
   headers: {
-    'x-api-key': import.meta.env.VITE_API_KEY
-  }
+    "x-api-key": import.meta.env.VITE_API_KEY,
+  },
 });
 
+instance.interceptors.response.use((response) => {
+  return response;
+}, handleApiError);
 
+interface ApiError {
+  response?: {
+    data: any;
+    status: number;
+    headers: any;
+  };
+  request?: any;
+  message?: string;
+}
 
-instance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  handleApiError
-);
-
-export function handleApiError(error: any) {
-    if (error.response) {       
-      console.log(error.response.data);
-      console.log(error.response.status);
-      console.log(error.response.headers);
-    } else if (error.request) {        
-      console.log(error.request);
-    } else {        
-      console.log('Error', error.message);
-    }
-    return Promise.reject(error);
+export function handleApiError(error: ApiError) {
+  if (error.response) {
+    console.error(error.response.data);
+    console.error(error.response.status);
+    console.error(error.response.headers);
+  } else if (error.request) {
+    console.error(error.request);
+  } else {
+    console.error("Error", error.message);
   }
+  return Promise.reject(error);
+}
 
 export default instance;

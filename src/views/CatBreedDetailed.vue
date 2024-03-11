@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
-import useCatBreedDetails from "../composables/getCatBreedDetails";
+import getCatBreedDetails from "../composables/getCatBreedDetails";
 
 const props = defineProps({
   catBreedID: {
@@ -10,7 +10,7 @@ const props = defineProps({
   },
 });
 
-const { breedDetails, error, fetchBreedDetails } = useCatBreedDetails(
+const { breedDetails, error, fetchBreedDetails } = getCatBreedDetails(
   props.catBreedID
 );
 

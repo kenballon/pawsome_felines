@@ -38,7 +38,7 @@ const handleSelectedBreed = async ({
       />
     </section>
 
-    <section class="search container">
+    <section class="search container pb-[4rem]">
       <div class="hero-text max-w-[500px] mx-auto mt-5">
         <router-link :to="{ name: 'home' }">
           <h1

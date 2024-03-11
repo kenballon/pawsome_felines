@@ -1,19 +1,19 @@
 import { ref } from "vue";
-import instance, { handleApiError } from './errorHandler';
+import instance, { handleApiError } from "./errorHandler";
 
-export default function useCatBreedDetails(breedId: string) {
+export default function getCatBreedDetails(breedId: string) {
   interface CatBreedDetails {
-    id: string;
-    name: string;
-    origin: string;
-    description: string;
-    temperament: string;
-    wikipedia_url: string;
+    readonly id: string;
+    readonly name: string;
+    readonly origin: string;
+    readonly description: string;
+    readonly temperament: string;
+    readonly wikipedia_url: string;
   }
   interface CatOneImage {
-    id: string;
-    url: string;
-    breeds: CatBreedDetails[];
+    readonly id: string;
+    readonly url: string;
+    readonly breeds: CatBreedDetails[];
   }
 
   const breedDetails = ref<CatOneImage[]>([]);
@@ -22,28 +22,25 @@ export default function useCatBreedDetails(breedId: string) {
   const fetchBreedDetails = async () => {
     try {
       const response = await instance.get(`/images/${breedId}`);
-      
-      if (response.data && Array.isArray(response.data.breeds)) {
-        const item = response.data;
-        const filteredData: CatOneImage = {
-          id: item.id,
-          url: item.url,
-          breeds: Array.isArray(item.breeds) ? item.breeds.map((breed: any) => ({
-            id: breed.id,
-            name: breed.name,
-            origin: breed.origin,
-            description: breed.description,
-            temperament: breed.temperament,
-            wikipedia_url: breed.wikipedia_url,
-          })) : [],
-        };
-        breedDetails.value.push(filteredData);
-      } else {
-        throw new Error('Invalid response data')
-      }
+
+      const filteredData: CatOneImage = {
+        id: response.data?.id,
+        url: response.data?.url,
+        breeds:
+          response.data?.breeds?.map((breed: any) => ({
+            id: breed?.id,
+            name: breed?.name,
+            origin: breed?.origin,
+            description: breed?.description,
+            temperament: breed?.temperament,
+            wikipedia_url: breed?.wikipedia_url,
+          })) ?? [],
+      };
+
+      breedDetails.value.push(filteredData);
     } catch (err) {
       error.value = err as Error;
-      handleApiError(err);
+      handleApiError(error.value);
     }
   };
 

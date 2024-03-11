@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
-import useCatBreeds from "@/composables/getAllCatBreeds";
+import getAllCatBreeds from "@/composables/getAllCatBreeds";
 
 // Defined props
 const props = defineProps({
@@ -14,13 +14,13 @@ const props = defineProps({
 interface Breed {
   id: string;
   name: string;
-  image_ref_id: string;
+  reference_image_id: string;
 }
 
 // Initialize refs
 const searchTerm = ref(props.searchTerm);
 const emit = defineEmits(["selectedBreed"]);
-const { breeds, fetchBreeds } = useCatBreeds();
+const { breeds, fetchBreeds } = getAllCatBreeds();
 const inputFocused = ref(false);
 const filteredBreeds = ref<Breed[]>([]);
 let blurTimeout: any = null;
@@ -43,7 +43,7 @@ watch([searchTerm, breeds], ([newVal, newBreeds]) => {
 const breedSelected = (breed: Breed) => {
   searchTerm.value = breed.name;
   inputFocused.value = false;
-  emit("selectedBreed", {breedId: breed.id, breedImgId: breed.image_ref_id}); 
+  emit("selectedBreed", {breedId: breed.id, breedImgId: breed.reference_image_id}); 
 };
 
 // Handle input blur
