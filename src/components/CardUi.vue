@@ -16,7 +16,11 @@ const isLoading = ref(true);
 
 onMounted(async () => {
   if (props.id) {
-    await fetchBreedDetails();
+    try {
+      await fetchBreedDetails();
+    } catch (error) {
+      console.error(error);
+    }
     isLoading.value = false;
   }
 });
@@ -28,11 +32,6 @@ const catBreedImage = computed(() => {
 const handleMoreDetails = () => {
   router.push({ name: "CatBreed", params: { catBreedID: props.id } });
 };
-
-const handleImageLoad = (event: Event) => {
-  const target = event.target as HTMLImageElement;
-  target.classList.add('loaded');
-};
 </script>
 
 <template>
@@ -43,11 +42,12 @@ const handleImageLoad = (event: Event) => {
       alt="Loading..."
     />
     <img
+      v-else
       class="cat_image fade-in"
+      :class="{ loaded: !isLoading }"
       :src="catBreedImage"
       alt="Breed image"
       width="250px"
-      @load="handleImageLoad"
     />
     <button
       class="bg-primary p-2 rounded-sm text-cyan-50 font-light"
