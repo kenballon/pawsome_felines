@@ -66,12 +66,7 @@ const handleFocus = () => {
   if (breeds.value.length === 0) {
     fetchBreeds();
   }
-  
 };
-
-const updateSearch = (value: string) => {
-  searchTerm.value = value;
-}
 
 </script>
 
@@ -89,7 +84,6 @@ const updateSearch = (value: string) => {
       aria-label="Search for cat breed"
       @focus="handleFocus"
       @blur="handleBlur"
-      @input="updateSearch(props.id)"
     />
 
     <div
