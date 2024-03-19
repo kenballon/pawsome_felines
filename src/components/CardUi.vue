@@ -26,11 +26,15 @@ onMounted(async () => {
 });
 
 const catBreedImage = computed(() => {
-  return breedDetails.value[0]?.url || '';
+  return breedDetails.value[0]?.url || "";
 });
 
 const handleMoreDetails = () => {
   router.push({ name: "CatBreed", params: { catBreedID: props.id } });
+};
+const handleImageLoad = (event: Event) => {
+  const target = event.target as EventTarget & HTMLImageElement;
+  target.classList.add("loaded");
 };
 </script>
 
@@ -44,10 +48,10 @@ const handleMoreDetails = () => {
     <img
       v-else
       class="cat_image fade-in"
-      :class="{ loaded: !isLoading }"
       :src="catBreedImage"
       alt="Breed image"
       width="250px"
+      v-on:load="handleImageLoad"
     />
     <button
       class="bg-primary p-2 rounded-sm text-cyan-50 font-light"
@@ -80,7 +84,7 @@ button {
 
 .fade-in {
   opacity: 0;
-  transition: opacity 1s ease-in-out;
+  transition: opacity 0.5s;
 }
 
 .fade-in.loaded {
